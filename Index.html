@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSystem - Gestão Completa para Consultório</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Sistema de gestão para consultório médico - PWA">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MedSystem">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        /* ESTILOS COMPLETOS DO SISTEMA */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #27ae60;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-icon {
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .splash-text {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .splash-subtext {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tela de Login */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--gray-color);
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background-color: #16a085;
+        }
+
+        /* Sistema Principal */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .logo {
+            text-align: center;
+            padding: 20px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            padding: 0;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-details .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-details .user-role {
+            font-size: 0.85rem;
+            color: var(--gray-color);
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .card-info {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-top: 5px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 0;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--primary-color);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background-color: #e9ecef;
+        }
+
+        .tab.active {
+            background-color: white;
+            border-bottom-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        /* Content Panels */
+        .content-panel {
+            background-color: white;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        /* Form Styles */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #16a085;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d68910;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        table .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .edit-btn {
+            color: var(--secondary-color);
+        }
+
+        .edit-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .delete-btn {
+            color: var(--danger-color);
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .view-btn {
+            color: var(--accent-color);
+        }
+
+        .view-btn:hover {
+            background-color: rgba(26, 188, 156, 0.1);
+        }
+
+        /* PWA Specific */
+        .offline-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: var(--warning-color);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            z-index: 9998;
+            display: none;
+        }
+
+        .offline-indicator.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 10000;
+            max-width: 300px;
+        }
+
+        .install-prompt.show {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .install-prompt button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .install-prompt button.close {
+            background: transparent;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0 5px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .nav-menu {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+            }
+            
+            .nav-menu a {
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                padding: 10px 15px;
+            }
+            
+            .nav-menu a:hover, .nav-menu a.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--accent-color);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .login-box {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-icon">
+            <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="splash-text">MedSystem</div>
+        <div class="splash-subtext">Sistema de Gestão Médica</div>
+        <div class="loader"></div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-indicator">
+        <i class="fas fa-wifi-slash"></i> Você está offline. Algumas funcionalidades podem estar limitadas.
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="install-prompt" class="install-prompt">
+        <div>
+            <strong>Instalar MedSystem</strong>
+            <div style="font-size: 0.85rem; opacity: 0.9;">Use como aplicativo nativo</div>
+        </div>
+        <button id="install-button">Instalar</button>
+        <button class="close" id="close-install-prompt">&times;</button>
+    </div>
+
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>Med<span>System</span></h1>
+                <p>Sistema de Gestão para Consultório</p>
+            </div>
+            
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <input type="password" id="login-password" placeholder="Sua senha" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+                </button>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: var(--gray-color); font-size: 0.9rem;">
+                        Primeiro acesso? <a href="#" id="register-link" style="color: var(--secondary-color); text-decoration: none;">Cadastre-se aqui</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Sistema Principal -->
+    <div id="main-system" class="container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>Med<span>System</span></h1>
+                <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Gestão Médica Completa</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#" data-tab="professional-profile"><i class="fas fa-user-md"></i> Meu Perfil</a></li>
+                <li><a href="#" data-tab="patient-registration"><i class="fas fa-user-plus"></i> Cadastrar Paciente</a></li>
+                <li><a href="#" data-tab="clinical-records"><i class="fas fa-notes-medical"></i> Fichas Clínicas</a></li>
+                <li><a href="#" data-tab="appointment-schedule"><i class="fas fa-calendar-alt"></i> Agenda</a></li>
+                <li><a href="#" data-tab="settings"><i class="fas fa-cog"></i> Configurações</a></li>
+            </ul>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2 id="page-title">Dashboard</h2>
+                <div class="user-actions">
+                    <button class="notification-btn" id="install-pwa-btn" style="display: none;" title="Instalar App">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    
+                    <div class="user-info" id="user-dropdown-toggle">
+                        <div class="user-avatar" id="user-avatar">DR</div>
+                        <div class="user-details">
+                            <div class="user-name" id="user-name">Dr. Médico</div>
+                            <div class="user-role" id="user-role">Médico</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard -->
+            <div id="dashboard" class="content-panel active">
+                <div class="dashboard-cards">
+                    <div class="card" data-tab="clinical-records">
+                        <i class="fas fa-notes-medical"></i>
+                        <h3>Pacientes Cadastrados</h3>
+                        <p id="patient-count">0</p>
+                        <div class="card-info">Total no sistema</div>
+                    </div>
+                    <div class="card" data-tab="appointment-schedule">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Consultas Hoje</h3>
+                        <p id="today-appointments">0</p>
+                        <div class="card-info">Agendadas para hoje</div>
+                    </div>
+                    <div class="card" data-tab="calendar-view">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Próximos 7 Dias</h3>
+                        <p id="week-appointments">0</p>
+                        <div class="card-info">Consultas agendadas</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3>Últimos Pacientes Cadastrados</h3>
+                    <div class="table-container">
+                        <table id="recent-patients-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Telefone</th>
+                                    <th>E-mail</th>
+                                    <th>Data Cadastro</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dados serão carregados via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Perfil do Profissional -->
+            <div id="professional-profile" class="content-panel">
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+                    <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2rem;">DR</div>
+                    <div>
+                        <h2 id="profile-name">Dr. Médico</h2>
+                        <p id="profile-email">medico@consultorio.com</p>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Informações Pessoais</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-fullname">Nome Completo</label>
+                            <input type="text" id="profile-fullname" placeholder="Dr. Nome Completo">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-crm">CRM</label>
+                            <input type="text" id="profile-crm" placeholder="CRM/UF-000000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-specialty">Especialidade</label>
+                            <input type="text" id="profile-specialty" placeholder="Clínico Geral">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-phone">Telefone</label>
+                            <input type="text" id="profile-phone" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-success" id="save-profile">
+                            <i class="fas fa-save"></i> Salvar Perfil
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cadastro de Pacientes -->
+            <div id="patient-registration" class="content-panel">
+                <h2>Cadastro de Paciente</h2>
+                
+                <form id="patient-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient-name">Nome Completo *</label>
+                            <input type="text" id="patient-name" placeholder="Digite o nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-cpf">CPF</label>
+                            <input type="text" id="patient-cpf" placeholder="000.000.000-00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient-phone">Telefone *</label>
+                            <input type="text" id="patient-phone" placeholder="(00) 00000-0000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-email">E-mail</label>
+                            <input type="email" id="patient-email" placeholder="paciente@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="patient-dob">Data de Nascimento</label>
+                            <input type="date" id="patient-dob">
+                        </div>
+                        <div class="form-group">
+                            <label for="patient-gender">Sexo</label>
+                            <select id="patient-gender">
+                                <option value="">Selecione</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Feminino">Feminino</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Salvar Paciente
+                        </button>
+                        <button type="button" class="btn btn-outline" id="clear-patient-form">
+                            <i class="fas fa-times"></i> Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Fichas Clínicas -->
+            <div id="clinical-records" class="content-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2>Fichas Clínicas</h2>
+                    <button class="btn btn-primary" id="refresh-patients">
+                        <i class="fas fa-sync"></i> Atualizar
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Paciente</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão carregados via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Agenda -->
+            <div id="appointment-schedule" class="content-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2>Agenda de Consultas</h2>
+                    <button class="btn btn-success" id="add-appointment-btn">
+                        <i class="fas fa-plus"></i> Nova Consulta
+                    </button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Paciente</th>
+                                <th>Motivo</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão carregados via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Configurações -->
+            <div id="settings" class="content-panel">
+                <h2>Configurações do Sistema</h2>
+                
+                <div class="form-section">
+                    <h3>Configurações Gerais</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clinic-name">Nome do Consultório</label>
+                            <input type="text" id="clinic-name" placeholder="Consultório Médico">
+                        </div>
+                        <div class="form-group">
+                            <label for="clinic-phone">Telefone</label>
+                            <input type="text" id="clinic-phone" placeholder="(00) 0000-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clinic-address">Endereço</label>
+                            <input type="text" id="clinic-address" placeholder="Rua, número, complemento">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Segurança</h3>
+                    <div class="button-group">
+                        <button class="btn btn-danger" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Sair do Sistema
+                        </button>
+                        <button class="btn btn-warning" id="clear-data-btn">
+                            <i class="fas fa-trash"></i> Limpar Dados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmação</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmation-message"></p>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn btn-outline" id="cancel-action">Cancelar</button>
+                    <button class="btn btn-danger" id="confirm-action">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <!-- App JavaScript COMPLETO -->
+    <script>
+        // Sistema MedSystem - PWA Completo
+        class MedSystem {
+            constructor() {
+                this.currentUser = null;
+                this.patients = [];
+                this.appointments = [];
+                this.settings = {};
+                this.deferredPrompt = null;
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadData();
+                this.setupPWA();
+                this.renderLoginScreen();
+                this.setupEventListeners();
+                
+                // Esconder splash screen após 2 segundos
+                setTimeout(() => {
+                    document.getElementById('splash-screen').classList.add('hidden');
+                    setTimeout(() => {
+                        document.getElementById('splash-screen').style.display = 'none';
+                    }, 500);
+                }, 2000);
+            }
+            
+            loadData() {
+                // Carregar dados do localStorage
+                this.currentUser = JSON.parse(localStorage.getItem('medsystem_user')) || null;
+                this.patients = JSON.parse(localStorage.getItem('medsystem_patients')) || [];
+                this.appointments = JSON.parse(localStorage.getItem('medsystem_appointments')) || [];
+                this.settings = JSON.parse(localStorage.getItem('medsystem_settings')) || {};
+                
+                // Dados de exemplo se estiver vazio
+                if (this.patients.length === 0) {
+                    this.patients = [
+                        {
+                            id: '1',
+                            name: 'Maria Silva Santos',
+                            phone: '(11) 99999-9999',
+                            email: 'maria@email.com',
+                            dob: '1985-05-15',
+                            cpf: '123.456.789-00',
+                            gender: 'Feminino',
+                            createdAt: new Date().toISOString()
+                        },
+                        {
+                            id: '2',
+                            name: 'João Carlos Oliveira',
+                            phone: '(11) 98888-8888',
+                            email: 'joao@email.com',
+                            dob: '1990-08-22',
+                            cpf: '987.654.321-00',
+                            gender: 'Masculino',
+                            createdAt: new Date().toISOString()
+                        }
+                    ];
+                    this.savePatients();
+                }
+                
+                if (!this.currentUser) {
+                    // Usuário de exemplo
+                    this.currentUser = {
+                        id: '1',
+                        name: 'Dr. Carlos Silva',
+                        email: 'dr.carlos@consultorio.com',
+                        crm: 'CRM/SP-123456',
+                        specialty: 'Clínico Geral',
+                        phone: '(11) 98765-4321'
+                    };
+                    localStorage.setItem('medsystem_user', JSON.stringify(this.currentUser));
+                }
+            }
+            
+            savePatients() {
+                localStorage.setItem('medsystem_patients', JSON.stringify(this.patients));
+            }
+            
+            saveAppointments() {
+                localStorage.setItem('medsystem_appointments', JSON.stringify(this.appointments));
+            }
+            
+            saveSettings() {
+                localStorage.setItem('medsystem_settings', JSON.stringify(this.settings));
+            }
+            
+            setupPWA() {
+                // Registrar Service Worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(reg => {
+                            console.log('Service Worker registrado:', reg);
+                        })
+                        .catch(err => {
+                            console.log('Falha ao registrar Service Worker:', err);
+                        });
+                }
+                
+                // Detectar conexão
+                window.addEventListener('online', () => {
+                    document.getElementById('offline-indicator').classList.remove('show');
+                });
+                
+                window.addEventListener('offline', () => {
+                    document.getElementById('offline-indicator').classList.add('show');
+                });
+                
+                // Prompt de instalação PWA
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    this.deferredPrompt = e;
+                    
+                    // Mostrar botão de instalação
+                    const installBtn = document.getElementById('install-pwa-btn');
+                    if (installBtn) {
+                        installBtn.style.display = 'flex';
+                        installBtn.addEventListener('click', () => {
+                            this.showInstallPrompt();
+                        });
+                    }
+                });
+            }
+            
+            showInstallPrompt() {
+                if (this.deferredPrompt) {
+                    this.deferredPrompt.prompt();
+                    this.deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuário aceitou a instalação');
+                        }
+                        this.deferredPrompt = null;
+                    });
+                }
+            }
+            
+            renderLoginScreen() {
+                const loginScreen = document.getElementById('login-screen');
+                const mainSystem = document.getElementById('main-system');
+                
+                if (this.currentUser) {
+                    loginScreen.style.display = 'none';
+                    mainSystem.style.display = 'flex';
+                    this.renderMainSystem();
+                } else {
+                    loginScreen.style.display = 'flex';
+                    mainSystem.style.display = 'none';
+                }
+            }
+            
+            renderMainSystem() {
+                // Atualizar informações do usuário
+                document.getElementById('user-avatar').textContent = 
+                    this.currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('user-name').textContent = this.currentUser.name;
+                document.getElementById('profile-name').textContent = this.currentUser.name;
+                document.getElementById('profile-email').textContent = this.currentUser.email;
+                
+                // Preencher formulário de perfil
+                document.getElementById('profile-fullname').value = this.currentUser.name || '';
+                document.getElementById('profile-crm').value = this.currentUser.crm || '';
+                document.getElementById('profile-specialty').value = this.currentUser.specialty || '';
+                document.getElementById('profile-phone').value = this.currentUser.phone || '';
+                
+                // Preencher configurações
+                document.getElementById('clinic-name').value = this.settings.clinicName || '';
+                document.getElementById('clinic-phone').value = this.settings.clinicPhone || '';
+                document.getElementById('clinic-address').value = this.settings.clinicAddress || '';
+                
+                // Atualizar dashboard
+                this.updateDashboard();
+                this.loadPatientsTable();
+                this.loadAppointmentsTable();
+            }
+            
+            updateDashboard() {
+                document.getElementById('patient-count').textContent = this.patients.length;
+                
+                // Consultas de hoje
+                const today = new Date().toISOString().split('T')[0];
+                const todayApps = this.appointments.filter(app => app.date === today).length;
+                document.getElementById('today-appointments').textContent = todayApps;
+                
+                // Próximos 7 dias
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                const weekApps = this.appointments.filter(app => {
+                    const appDate = new Date(app.date);
+                    const today = new Date();
+                    return appDate >= today && appDate <= nextWeek;
+                }).length;
+                document.getElementById('week-appointments').textContent = weekApps;
+                
+                // Últimos pacientes
+                this.loadRecentPatients();
+            }
+            
+            loadRecentPatients() {
+                const tableBody = document.querySelector('#recent-patients-table tbody');
+                const recentPatients = [...this.patients]
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .slice(0, 5);
+                
+                tableBody.innerHTML = recentPatients.map(patient => `
+                    <tr>
+                        <td>${patient.name}</td>
+                        <td>${patient.phone}</td>
+                        <td>${patient.email || '-'}</td>
+                        <td>${new Date(patient.createdAt).toLocaleDateString('pt-BR')}</td>
+                    </tr>
+                `).join('');
+            }
+            
+            loadPatientsTable() {
+                const tableBody = document.querySelector('#patients-table tbody');
+                
+                tableBody.innerHTML = this.patients.map(patient => `
+                    <tr>
+                        <td>${patient.name}</td>
+                        <td>${patient.phone}</td>
+                        <td>${patient.email || '-'}</td>
+                        <td class="actions">
+                            <button class="action-btn view-btn" onclick="system.viewPatient('${patient.id}')" title="Visualizar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn edit-btn" onclick="system.editPatient('${patient.id}')" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="system.deletePatient('${patient.id}')" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            loadAppointmentsTable() {
+                const tableBody = document.querySelector('#appointments-table tbody');
+                
+                if (this.appointments.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: var(--gray-color);">
+                                Nenhuma consulta agendada. <button class="btn btn-success btn-sm" onclick="document.getElementById('add-appointment-btn').click()">Agendar agora</button>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                tableBody.innerHTML = this.appointments.map(app => `
+                    <tr>
+                        <td>${new Date(app.date).toLocaleDateString('pt-BR')}</td>
+                        <td>${app.time}</td>
+                        <td>${app.patientName}</td>
+                        <td>${app.reason || 'Consulta de rotina'}</td>
+                        <td>
+                            <span style="font-size: 0.85rem; padding: 4px 10px; border-radius: 20px; background-color: ${app.status === 'confirmed' ? 'var(--accent-color)' : 'var(--warning-color)'}; color: white;">
+                                ${app.status === 'confirmed' ? 'Confirmada' : 'Pendente'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            setupEventListeners() {
+                // Login
+                document.getElementById('login-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+                
+                // Cadastro
+                document.getElementById('register-link').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleRegister();
+                });
+                
+                // Navegação
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.nav-menu a')) {
+                        e.preventDefault();
+                        this.handleNavigation(e.target.closest('.nav-menu a'));
+                    }
+                    
+                    if (e.target.closest('.card[data-tab]')) {
+                        e.preventDefault();
+                        const tab = e.target.closest('.card[data-tab]').getAttribute('data-tab');
+                        this.switchToTab(tab);
+                    }
+                });
+                
+                // Formulário de paciente
+                document.getElementById('patient-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.savePatient();
+                });
+                
+                document.getElementById('clear-patient-form').addEventListener('click', () => {
+                    document.getElementById('patient-form').reset();
+                });
+                
+                // Perfil
+                document.getElementById('save-profile').addEventListener('click', () => {
+                    this.saveProfile();
+                });
+                
+                // Configurações
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    this.showConfirmation('Tem certeza que deseja sair do sistema?', () => {
+                        this.logout();
+                    });
+                });
+                
+                document.getElementById('clear-data-btn').addEventListener('click', () => {
+                    this.showConfirmation('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.', () => {
+                        this.clearAllData();
+                    });
+                });
+                
+                // Nova consulta
+                document.getElementById('add-appointment-btn').addEventListener('click', () => {
+                    this.addAppointment();
+                });
+                
+                // Atualizar pacientes
+                document.getElementById('refresh-patients').addEventListener('click', () => {
+                    this.loadPatientsTable();
+                });
+                
+                // Fechar modais
+                document.querySelectorAll('.close-modal').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('confirmation-modal').classList.remove('active');
+                    });
+                });
+                
+                document.getElementById('cancel-action').addEventListener('click', () => {
+                    document.getElementById('confirmation-modal').classList.remove('active');
+                });
+                
+                // Fechar prompt de instalação
+                document.getElementById('close-install-prompt').addEventListener('click', () => {
+                    document.getElementById('install-prompt').classList.remove('show');
+                });
+                
+                document.getElementById('install-button').addEventListener('click', () => {
+                    this.showInstallPrompt();
+                    document.getElementById('install-prompt').classList.remove('show');
+                });
+            }
+            
+            handleLogin() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    alert('Preencha todos os campos');
+                    return;
+                }
+                
+                // Login simples - em produção, usar autenticação segura
+                this.currentUser = {
+                    id: '1',
+                    name: 'Dr. Carlos Silva',
+                    email: email,
+                    crm: 'CRM/SP-123456',
+                    specialty: 'Clínico Geral',
+                    phone: '(11) 98765-4321'
+                };
+                
+                localStorage.setItem('medsystem_user', JSON.stringify(this.currentUser));
+                this.renderLoginScreen();
+                
+                // Mostrar mensagem de boas-vindas
+                setTimeout(() => {
+                    alert(`Bem-vindo(a) de volta, ${this.currentUser.name.split(' ')[0]}!`);
+                }, 500);
+            }
+            
+            handleRegister() {
+                const name = prompt('Digite seu nome completo:');
+                const email = prompt('Digite seu e-mail:');
+                const password = prompt('Digite uma senha:');
+                
+                if (name && email && password) {
+                    this.currentUser = {
+                        id: Date.now().toString(),
+                        name: name,
+                        email: email,
+                        crm: '',
+                        specialty: '',
+                        phone: ''
+                    };
+                    
+                    localStorage.setItem('medsystem_user', JSON.stringify(this.currentUser));
+                    this.renderLoginScreen();
+                    
+                    alert('Cadastro realizado com sucesso! Complete seu perfil profissional.');
+                }
+            }
+            
+            handleNavigation(link) {
+                // Ativar link
+                document.querySelectorAll('.nav-menu a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                
+                // Mostrar painel
+                const tab = link.getAttribute('data-tab');
+                this.switchToTab(tab);
+            }
+            
+            switchToTab(tab) {
+                document.querySelectorAll('.content-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(tab).classList.add('active');
+                
+                // Atualizar título
+                const link = document.querySelector(`.nav-menu a[data-tab="${tab}"]`);
+                if (link) {
+                    document.getElementById('page-title').textContent = link.textContent.trim();
+                }
+                
+                // Atualizar dados específicos da aba
+                if (tab === 'clinical-records') {
+                    this.loadPatientsTable();
+                } else if (tab === 'appointment-schedule') {
+                    this.loadAppointmentsTable();
+                } else if (tab === 'dashboard') {
+                    this.updateDashboard();
+                }
+            }
+            
+            savePatient() {
+                const patient = {
+                    id: Date.now().toString(),
+                    name: document.getElementById('patient-name').value,
+                    phone: document.getElementById('patient-phone').value,
+                    email: document.getElementById('patient-email').value,
+                    cpf: document.getElementById('patient-cpf').value,
+                    dob: document.getElementById('patient-dob').value,
+                    gender: document.getElementById('patient-gender').value,
+                    createdAt: new Date().toISOString()
+                };
+                
+                if (!patient.name || !patient.phone) {
+                    alert('Nome e telefone são obrigatórios!');
+                    return;
+                }
+                
+                this.patients.push(patient);
+                this.savePatients();
+                
+                alert('Paciente cadastrado com sucesso!');
+                document.getElementById('patient-form').reset();
+                
+                // Atualizar visualizações
+                this.updateDashboard();
+                this.loadPatientsTable();
+                
+                // Voltar para a lista de pacientes
+                this.switchToTab('clinical-records');
+            }
+            
+            viewPatient(id) {
+                const patient = this.patients.find(p => p.id === id);
+                if (patient) {
+                    alert(`Paciente: ${patient.name}\nTelefone: ${patient.phone}\nE-mail: ${patient.email || 'Não informado'}\nCPF: ${patient.cpf || 'Não informado'}\nData Nasc.: ${patient.dob || 'Não informada'}\nSexo: ${patient.gender || 'Não informado'}`);
+                }
+            }
+            
+            editPatient(id) {
+                const patient = this.patients.find(p => p.id === id);
+                if (patient) {
+                    const newName = prompt('Editar nome:', patient.name);
+                    if (newName) {
+                        patient.name = newName;
+                        this.savePatients();
+                        this.loadPatientsTable();
+                        this.updateDashboard();
+                        alert('Paciente atualizado!');
+                    }
+                }
+            }
+            
+            deletePatient(id) {
+                this.showConfirmation('Tem certeza que deseja excluir este paciente?', () => {
+                    this.patients = this.patients.filter(p => p.id !== id);
+                    this.savePatients();
+                    this.loadPatientsTable();
+                    this.updateDashboard();
+                    alert('Paciente excluído!');
+                });
+            }
+            
+            saveProfile() {
+                this.currentUser.name = document.getElementById('profile-fullname').value;
+                this.currentUser.crm = document.getElementById('profile-crm').value;
+                this.currentUser.specialty = document.getElementById('profile-specialty').value;
+                this.currentUser.phone = document.getElementById('profile-phone').value;
+                
+                localStorage.setItem('medsystem_user', JSON.stringify(this.currentUser));
+                
+                // Atualizar interface
+                document.getElementById('user-avatar').textContent = 
+                    this.currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                document.getElementById('user-name').textContent = this.currentUser.name;
+                
+                alert('Perfil atualizado com sucesso!');
+            }
+            
+            addAppointment() {
+                if (this.patients.length === 0) {
+                    alert('Cadastre pelo menos um paciente antes de agendar uma consulta.');
+                    this.switchToTab('patient-registration');
+                    return;
+                }
+                
+                const patientId = prompt('Selecione o paciente (digite o número):\n' + 
+                    this.patients.map((p, i) => `${i + 1}. ${p.name}`).join('\n'));
+                
+                if (!patientId) return;
+                
+                const index = parseInt(patientId) - 1;
+                if (isNaN(index) || index < 0 || index >= this.patients.length) {
+                    alert('Paciente inválido!');
+                    return;
+                }
+                
+                const patient = this.patients[index];
+                const date = prompt('Data da consulta (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+                const time = prompt('Horário (HH:MM):', '14:00');
+                const reason = prompt('Motivo da consulta:', 'Consulta de rotina');
+                
+                if (date && time) {
+                    const appointment = {
+                        id: Date.now().toString(),
+                        patientId: patient.id,
+                        patientName: patient.name,
+                        date: date,
+                        time: time,
+                        reason: reason,
+                        status: 'confirmed',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    this.appointments.push(appointment);
+                    this.saveAppointments();
+                    this.loadAppointmentsTable();
+                    this.updateDashboard();
+                    
+                    alert(`Consulta agendada para ${patient.name} no dia ${date} às ${time}`);
+                }
+            }
+            
+            showConfirmation(message, callback) {
+                document.getElementById('confirmation-message').textContent = message;
+                document.getElementById('confirmation-modal').classList.add('active');
+                
+                const confirmBtn = document.getElementById('confirm-action');
+                const cancelBtn = document.getElementById('cancel-action');
+                
+                const handleConfirm = () => {
+                    callback();
+                    document.getElementById('confirmation-modal').classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                };
+                
+                const handleCancel = () => {
+                    document.getElementById('confirmation-modal').classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                };
+                
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+            }
+            
+            logout() {
+                this.currentUser = null;
+                localStorage.removeItem('medsystem_user');
+                this.renderLoginScreen();
+                document.getElementById('login-form').reset();
+            }
+            
+            clearAllData() {
+                localStorage.clear();
+                this.currentUser = null;
+                this.patients = [];
+                this.appointments = [];
+                this.settings = {};
+                this.renderLoginScreen();
+                alert('Todos os dados foram apagados. O sistema foi resetado.');
+            }
+        }
+        
+        // Inicializar o sistema
+        const system = new MedSystem();
+        window.system = system; // Para acesso global
+    </script>
+</body>
+</html>
